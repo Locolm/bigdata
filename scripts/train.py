@@ -10,7 +10,7 @@ from xgboost import XGBClassifier
 from sklearn.metrics import accuracy_score, f1_score, classification_report
 
 #  Chargement des données
-df = pd.read_csv("data/ref_data.csv")
+df = pd.read_csv("../data/ref_data.csv")
 
 # Séparation des features (X) et de la target (y)
 X = df.drop(columns=["Survived"])
@@ -73,7 +73,8 @@ for name, model in models.items():
         best_model = grid.best_estimator_
         best_name = name
 
-# Sauvegarde du meilleur modèle
-print(f"\n🏆 Meilleur modèle : {best_name} avec une accuracy de {best_score:.4f}")
-joblib.dump(best_model, "artifacts/best_model.pkl")
-print("Modèle enregistré dans 'artifacts/best_model.pkl' !")
+if __name__=="__main__":
+    # Sauvegarde du meilleur modèle
+    print(f"\nMeilleur modèle : {best_name} avec une accuracy de {best_score:.4f}")
+    joblib.dump(best_model, "artifacts/best_model.pkl")
+    print("Modèle enregistré dans 'artifacts/best_model.pkl' !")
