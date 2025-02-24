@@ -39,3 +39,32 @@ generate_data.py réalise les actions suivantes :
 à la fin on obtient test_data.csv qui sera le fichier utiliser pour tester notre modèle.
 
 ## Entraînement du Modèle
+
+
+## Partie API
+
+La librairie pipreqs a été utilisée ici afin de générer le fichier requirements.txt et ne lister que les librairies nécessaires à ce projet via la commande :
+
+```bash
+$ pipreqs --encoding=utf8
+```
+
+Pour lancer l'API manuellement, il suffit de lancer la commande :
+
+```bash
+$ fastapi dev api.py
+```
+
+Pour build l'image Docker de l'api et la run:
+
+```bash
+$ Docker build -t api_titanic .
+$ Docker run -p 8080:8080 api_titanic
+```
+
+Le -t permet de donner à l'image le nom api_titanic.
+Le "." sert à indiquer que le Dockerfile utilisé pour construire cette image se trouve dans le répertoire actuel.
+
+Une erreur peut survenir durant le build de l'image car l'import de certaines librairies prend énormément de temps (xgboost notamment).
+En attendant, possible de lancer l'api en laissant juste les 2 premières lignes dans requirements : uvicorn et fastapi.
+A voir si on les laisse.
