@@ -3,7 +3,7 @@ import numpy as np
 from sklearn.preprocessing import StandardScaler
 
 # Charger les données de référence
-df_ref = pd.read_csv("data/ref_data.csv")
+df_ref = pd.read_csv("../data/ref_data.csv")
 
 # Déterminer les distributions des données réelles
 pclass_dist = df_ref["Pclass"].value_counts(normalize=True).to_dict()

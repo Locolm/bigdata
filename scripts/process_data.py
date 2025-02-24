@@ -22,6 +22,6 @@ scaler = StandardScaler()
 df[["Age", "Fare"]] = scaler.fit_transform(df[["Age", "Fare"]])
 
 # Sauvegarde du dataset préparé
-df.to_csv("data/ref_data.csv", index=False)
+df.to_csv("../data/ref_data.csv", index=False)
 
 print("Prétraitement terminé, fichier 'ref_data.csv' créé !")
