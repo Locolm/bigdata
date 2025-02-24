@@ -68,3 +68,12 @@ Le "." sert à indiquer que le Dockerfile utilisé pour construire cette image s
 Une erreur peut survenir durant le build de l'image car l'import de certaines librairies prend énormément de temps (xgboost notamment).
 En attendant, possible de lancer l'api en laissant juste les 2 premières lignes dans requirements : uvicorn et fastapi.
 A voir si on les laisse.
+
+## Test & Appels
+
+POST
+http://127.0.0.1:8080/predict/
+
+{
+    "content": "ok"
+}
