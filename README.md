@@ -77,3 +77,24 @@ http://127.0.0.1:8080/predict/
 {
     "content": "ok"
 }
+
+## Intégration Pipeline / API
+
+Les différents composants de la pipeline sont les suivants :
+- drop_columns_transformer : Suppression des colonnes inutiles / Garder uniquement les colonnes utiles
+- encoder : Encodage des variables catégorielles (Sex & Embarked)
+- scaler : Normalisation des variables numériques (Age & Fare)
+- train_model : Random Forest Classifier entrainé sur le dataset Titanic
+- pipeline : Pipeline regroupant les différents composants
+- fixed_pipeline : Pipeline sans le composant drop_columns_transformer (fonctionne mieux pour l'API)
+
+![img.png](img.png)
+
+### Côté API : 
+
+- Il faut importer la pipeline fixed_pipeline (joblib).
+- Récupérer les données de la requête.
+- Transformer les données en DataFrame.
+- Garder uniquement les colonnes utiles.
+- Prédire les données.
+- Retourner les prédictions.
