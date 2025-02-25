@@ -6,8 +6,12 @@ import pandas as pd
 class Request(BaseModel):
     data: dict
 
+def drop_columns(X):
+    columns = ["Pclass", "Sex", "Age", "SibSp", "Parch", "Fare", "Embarked"]
+    return X[columns]
+
 # Load pipeline
-pipeline = joblib.load("model/pipeline.pkl")
+pipeline = joblib.load("fixed_pipeline.joblib")
 
 app = FastAPI()
 
@@ -28,9 +32,10 @@ async def perdict(request: Request):
             raise ValueError(f"Input data must contain the following columns: {required_columns}")
 
         input_data = pd.DataFrame([request.data])
+
+        input_data = drop_columns(input_data)
         prediction = pipeline.predict(input_data)
     except Exception as e:
         return {"error": str(e)}
 
     return {"prediction": prediction[0]}
-
