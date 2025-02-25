@@ -8,7 +8,7 @@ def drop_columns(X):
     return X[columns]
 
 # Load pipeline
-pipeline = joblib.load("fixed_pipeline.joblib")
+pipeline = joblib.load("fixed_pipeline.pkl")
 
 app = FastAPI()
 
@@ -31,13 +31,11 @@ async def perdict(passenger: dict):
         input_data = pd.DataFrame([passenger])
         input_data = drop_columns(input_data)
 
-        print(type(input_data), input_data)
-
-        prediction = pipeline.predict(input_data.values)
+        prediction = pipeline.predict(input_data)
     except Exception as e:
         return {"error": str(e)}
 
-    return {"prediction": prediction[0]}
+    return {"prediction": prediction[0].item()}
 
 if __name__ == "__main__":
     import uvicorn
