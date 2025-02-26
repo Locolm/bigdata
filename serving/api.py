@@ -1,22 +1,22 @@
 import joblib
 import pandas as pd
-from fastapi import FastAPI
-
+from fastapi import FastAPI, File, UploadFile
+import io
 
 def drop_columns(X):
     columns = ["Pclass", "Sex", "Age", "SibSp", "Parch", "Fare", "Embarked"]
     return X[columns]
 
 # Load pipeline
-pipeline = joblib.load("fixed_pipeline.pkl")
+pipeline = joblib.load("../artifacts/pipeline.pkl")
 
 app = FastAPI()
 
 @app.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "Welcome to the Titanic survival prediction API"}
 
-@app.post("/predict/")
+@app.post("/predict")
 async def perdict(passenger: dict):
 
     try:
@@ -28,15 +28,33 @@ async def perdict(passenger: dict):
         if not all(col in passenger for col in required_columns):
             raise ValueError(f"Input data must contain the following columns: {required_columns}")
 
-        input_data = pd.DataFrame([passenger])
-        input_data = drop_columns(input_data)
+        data = pd.DataFrame([passenger])
+        data = drop_columns(data)
 
-        prediction = pipeline.predict(input_data)
+        prediction = pipeline.predict(data)
     except Exception as e:
         return {"error": str(e)}
 
-    return {"prediction": prediction[0].item()}
+    return {"Survived": prediction[0].item()}
+
+@app.post("/predict-file")
+async def endpoint(file: UploadFile = File(...)):
+    try:
+        contents = await file.read()
+        data = pd.read_csv(io.StringIO(contents.decode("utf-8")))
+
+        original = data.copy()
+        data = drop_columns(data)
+
+        prediction = pipeline.predict(data)
+
+        # Merge the prediction with the original data
+        original["Survived"] = prediction
+    except Exception as e:
+        return {"error": str(e)}
+
+    return original[["PassengerId", "Survived"]].to_dict(orient="records")
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    uvicorn.run(app, host="127.0.0.1", port=8080)
