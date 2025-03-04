@@ -8,7 +8,7 @@ def drop_columns(X):
     return X[columns]
 
 # Load pipeline
-pipeline = joblib.load("../artifacts/pipeline.pkl")
+pipeline = joblib.load("./pipeline.pkl")
 
 app = FastAPI()
 
