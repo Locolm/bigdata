@@ -3,8 +3,11 @@ import requests
 import io
 import pandas as pd
 
-# URL de l'API de serving
-API_URL = "http://127.0.0.1:8080/predict-file"
+import os
+
+API_URL = os.environ.get("API_URL", "http://127.0.0.1:8080/")
+
+print(f"Using API URL: {API_URL}")
 
 # Titre de l'application
 st.title("Titanic Survival Prediction")
@@ -30,7 +33,7 @@ if uploaded_file is not None:
         files = {"file": uploaded_file.getvalue()}
 
         # Requête POST vers l'API de serving
-        response = requests.post(API_URL, files=files, headers={
+        response = requests.post(API_URL + "predict-file", files=files, headers={
         })
 
         # Afficher le résultat

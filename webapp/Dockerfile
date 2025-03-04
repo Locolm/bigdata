@@ -10,11 +10,11 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the FastAPI app
-COPY api.py .
-COPY pipeline.pkl .
+COPY app.py .
 
-# Expose FastAPI port
-EXPOSE 8080
+# Expose Streamlit port
+EXPOSE 8081
 
-# Start FastAPI server
-CMD ["uvicorn", "api:app", "--host", "0.0.0.0", "--port", "8080"]
+HEALTHCHECK CMD curl --fail http://localhost:8501/_stcore/health
+
+ENTRYPOINT ["streamlit", "run", "app.py", "--server.port=8081", "--server.address=0.0.0.0"]
