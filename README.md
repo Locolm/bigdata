@@ -3,11 +3,28 @@
 Double diplôme IA
 *BONADA Nathan - LAURENT Clément - LE TRUNG Ethan - RANDRIANTSOA Matthieu*
 
-Ce projet a pour objectif d’entraîner un modèle de Machine Learning sur le dataset Titanic afin de prédire si un passager a survécu ou non en fonction de ses caractéristiques. L'objectif est de mettre en production ce modèle en développant une API de serving et en l'intégrant dans un pipeline complet, le tout conteneurisé avec Docker.
+Ce projet a pour objectif d’entraîner un modèle de Machine Learning sur le dataset Titanic afin de prédire si un passager a survécu ou non en fonction de ses caractéristiques. L'objectif est de mettre en production ce modèle en développant une API de serving et en l'intégrant dans une pipeline complete, le tout conteneurisé avec Docker.
 
 ## Structure du projet
 
-**data/** : Contient le fichier *ref_data.csv* après prétraitement. ainsi que le fichier *test_data.csv* qui sont les données surlesquelles on va tester notre modèle.
+```
+├── data/
+│   └── ref_data.csv
+│   └── test_data.csv
+│   └── test.csv
+├── artifcats/
+│   └── pipeline.pkl
+├── scripts/
+│   └── pipeline.py
+|   └── EDA.ipynb
+|   └── notebook.ipynb
+├── serving/
+│   └── api.py
+└── webapp/
+    └── app.py
+```
+
+**data/** : Contient le fichier *ref_data.csv* après prétraitement. ainsi que le fichier *test.csv* qui sont les données sur lesquelles on peut tester notre modèle.
 
 **scripts/** : Contient les scripts Python pour le prétraitement et l'entraînement du modèle.
 
@@ -15,14 +32,16 @@ Ce projet a pour objectif d’entraîner un modèle de Machine Learning sur le d
 
 **serving/** : Contient l'API de serving développée avec FastAPI.
 
+**serving/** : Contient l'interface applicative Streamlit.
+
 ## Prétraitement des Données
 
-Le fichier *EDA.ipynb* détaille les données du titanic afin de mieux comprendre le liens entre les caractéristiques et les personnes ayant survécu. Il explique en détail le processus réalisé par le script *process_data.py*
+Le fichier *EDA.ipynb* détaille les données du dataset Titanic afin de mieux comprendre le liens entre les caractéristiques et les personnes ayant survécu. Il explique en détail la réflexion et le processus réalisé.
 
 Le script *process_data.py* réalise :
 - Chargement des données depuis un fichier CSV
 - Suppression des colonnes inutiles (Name, Ticket, Cabin)
-- Remplacement des valeurs manquantes (Age, Embarked)
+- Imputation des valeurs manquantes (Age, Embarked)
 - Encodage des variables catégorielles (Sex, Embarked)
 - Normalisation des variables numériques (Age, Fare)
 - Sauvegarde du dataset nettoyé sous data/ref_data.csv
@@ -63,7 +82,7 @@ Les différents composants de la pipeline sont les suivants :
 - pipeline : Pipeline regroupant les différents composants
 - fixed_pipeline : Pipeline sans le composant drop_columns_transformer (fonctionne mieux pour l'API)
 
-![img.png](img.png)
+<img alt="pipeline.png" src="misc/pipeline.png" width="600"/>
 
 ## Partie API
 
@@ -71,17 +90,13 @@ Une API de serving a été développée avec FastAPI pour permettre d'interroger
 
 Le code se situe dans **serving/**.
 
-POST
+[POST]
 http://127.0.0.1:8080/predict/
 
-![alt text](image.png)
+<img alt="pipeline.png" src="misc/postman.png" width="600"/>
 
-Pour lancer l'API manuellement, il suffit de lancer la commande :
+Pour lancer l'API manuellement, il suffit de lancer la commande suivante depuis le repertoire ./serving :
 
-```bash
-$ fastapi dev api.py
-```
-Ou alors on se déplace dans le fichier serving et on utilise la commande :
 ```bash
 $ uvicorn api:app --host 127.0.0.1 --port 8080
 ```
@@ -89,44 +104,31 @@ $ uvicorn api:app --host 127.0.0.1 --port 8080
 ## Interface
 
 Une interface est mise à disposition, pour l'utiliser manuellement il suffit de se rendre dans **webapp/** et d'utiliser la commande suivante :
+
 ```bash
 $ streamlit run app.py
 ```
 
 voici à quoi devrait ressembler l'interface après avoir lancé la prédiction : 
 
-![alt text](image-1.png)
+<img alt="pipeline.png" src="misc/webapp.png" width="600"/>
 
 ## Dockerisation
 
-La librairie pipreqs a été utilisée ici afin de générer le fichier requirements.txt et ne lister que les librairies nécessaires à ce projet via la commande :
+Les images docker peuvent être construites et lancées séparément via les commandes suivante : 
 
 ```bash
-$ pipreqs --encoding=utf8
+$ docker compose -f ./serving/docker-compose.yml
 ```
-
-Pour build l'image Docker de l'api et la run:
 
 ```bash
-$ Docker build -t api_titanic .
-$ Docker run -p 8080:8080 api_titanic
+$ docker compose -f ./webapp/docker-compose.yml
 ```
 
-Le -t permet de donner à l'image le nom api_titanic.
-Le "." sert à indiquer que le Dockerfile utilisé pour construire cette image se trouve dans le répertoire actuel.
+## Déploiement automatique
 
-# Brouillon
+Un fichier de configuration global permet de lancer toutes les briques de l'application. Pour cela, depuis la racine du dossier, entrer la commande suivante : 
 
-//Une erreur peut survenir durant le build de l'image car l'import de certaines librairies prend énormément de temps (xgboost notamment xgboost==2.1.4).
-Il est possible de lancer uniquement l'api en laissant juste les 2 premières lignes dans requirements : uvicorn et fastapi.//
-
-Reste à faire :
-Pour le moment on peut lancer manuellement l'api et l'interface =>
-- Lancer API : dans /serving
-uvicorn api:app --host 127.0.0.1 --port 8080
-
-- Lancer Webapp: dans /webapp
-streamlit run app.py
-
-Il faut faire un docker compose pour automatiser 
-
+```bash
+docker compose up --build
+```
